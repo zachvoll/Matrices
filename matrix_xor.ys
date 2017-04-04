@@ -1,5 +1,5 @@
 matrixFun:
-	pushl %ebp  		      #%eax is the return value
+	pushl %ebp  		#%eax is the return value
 	rrmovl %esp, %ebp
 	irmovl 0,%eax
 	rmmovl %eax,-8(%ebp)	#i
@@ -15,61 +15,61 @@ Loop_j:
 	
 Loop_k: 			
 	mrmovl 12(%ebp),%eax	#get A[i][k] pointer	#sum+=(A[i][k]^B[k][j])
-	mrmovl (%eax),%eax	  #get A[i][k] value
+	mrmovl (%eax),%eax	#get A[i][k] value
 	mrmovl 16(%ebp),%ebx	#get B[k][j] pointer
-	mrmovl (%ebx),%ebx	  #get B[k][j] value
-	xorl %ebx,%eax		    #xor them together
-	addl %eax,%edx		    #add to sum	
+	mrmovl (%ebx),%ebx	#get B[k][j] value
+	xorl %ebx,%eax		#xor them together
+	addl %eax,%edx		#add to sum	
 				                #update pointers:
 	mrmovl 12(%ebp),%eax	#get A[i][k] pointer
-	irmovl 4,%ebx		      #4
-	addl %ebx,%eax		    #A[i][k]+4
+	irmovl 4,%ebx		
+	addl %ebx,%eax		#A[i][k]+4
 	rmmovl %eax,12(%ebp)	#update pointer	
 	mrmovl 16(%ebp),%eax	#get B[k][j] pointer
 	mrmovl -20(%ebp),%ebx	#4*size
-	addl %ebx,%eax		    #B[k][j]+4*size
+	addl %ebx,%eax		#B[k][j]+4*size
 	rmmovl %eax,16(%ebp)	#update pointer	 
 	mrmovl -16(%ebp),%eax	#k++
 	irmovl 1,%ebx
 	addl %ebx,%eax
 	rmmovl %eax,-16(%ebp)	
- 			                  #check if we break loop
+ 			          #check if we break loop
 	mrmovl 8(%ebp),%ebx	  #ebx = size
-	subl %eax,%ebx		    #size - k
+	subl %eax,%ebx		  #size - k
 	jle Finish_k_loop
 	jmp Loop_k		
 
 Finish_k_loop:
 	mrmovl 20(%ebp),%eax	#eax = C[i][j] pointer
-	rmmovl %edx,(%eax)	  #move sum into C[i][j]
+	rmmovl %edx,(%eax)	#move sum into C[i][j]
 
-	irmovl 4,%ebx		      #4
-	addl %ebx,%eax		    #add 4 to C[i][j] pointer
+	irmovl 4,%ebx		   
+	addl %ebx,%eax		#add 4 to C[i][j] pointer
 	rmmovl %eax,20(%ebp) 	#update C[i][j] pointer 
 
-	irmovl 0,%eax		      #k=0
+	irmovl 0,%eax		#k=0
 	rmmovl %eax,-16(%ebp)	
 
 	mrmovl -12(%ebp),%eax	#j++
 	irmovl 1,%ecx
 	addl %ecx,%eax
 	rmmovl %eax,-12(%ebp)
-	rrmovl %eax,%esi	    #store j in esi	
+	rrmovl %eax,%esi	#store j in esi	
 	
 	mrmovl 16(%ebp),%eax	#get B[k][j] pointer
-	addl %ebx,%eax		    #add four to B[k][j] pointer
+	addl %ebx,%eax		#add four to B[k][j] pointer
 	mrmovl -24(%ebp),%ebx	#get large decrementer
-	subl %ebx,%eax		    #subtract 4*size*size from B[k][j] pointer
+	subl %ebx,%eax		#subtract 4*size*size from B[k][j] pointer
 	rmmovl %eax,16(%ebp)	#update pointer
 
 	mrmovl 12(%ebp),%eax	#get A[i][k] pointer
 	mrmovl -20(%ebp),%ebx	#get small decrementer 
-	subl %ebx,%eax		    #A[i][k]-4*size
+	subl %ebx,%eax		#A[i][k]-4*size
 	rmmovl %eax,12(%ebp)	#update pointer
 
-	mrmovl 8(%ebp),%eax	  #get size
-	subl %esi,%eax		    #size-j
-	jle Finish_j_loop	    #if we broke j loop jump to finish_j_loop
+	mrmovl 8(%ebp),%eax	#get size
+	subl %esi,%eax		#size-j
+	jle Finish_j_loop	#if we broke j loop jump to finish_j_loop
 	jmp Loop_j
 
 Finish_j_loop:
@@ -78,7 +78,7 @@ Finish_j_loop:
 
 	mrmovl -8(%ebp),%eax	#get i
 	irmovl 1,%ebx
-	addl %ebx,%eax		    #add 1 to i
+	addl %ebx,%eax		#add 1 to i
 	rmmovl %eax,-8(%ebp)	#update i
 
 	mrmovl 12(%ebp),%ebx	#load A[i][k] pointer
@@ -102,23 +102,23 @@ Incrementer:
 	rmmovl %eax,-20(%ebp)
 
 Big_Decrementer:
-	rrmovl %eax,%ebx	  #4*size
+	rrmovl %eax,%ebx	#4*size
 	mrmovl 8(%ebp),%ecx	#size
-	irmovl 1,%edx		    #decrementer used for jump table
-	subl %edx,%ecx		  #size = 1
+	irmovl 1,%edx		#decrementer used for jump table
+	subl %edx,%ecx		#size = 1
 	je Dec_F
 	addl %eax,%eax
-	subl %edx,%ecx		  #size = 2
+	subl %edx,%ecx		#size = 2
 	je Dec_F
-	subl %edx,%ecx		  #size = 3
+	subl %edx,%ecx		#size = 3
 	je Size_3
-	subl %edx,%ecx		  #size = 4
+	subl %edx,%ecx		#size = 4
 	je Size_4
-	subl %edx,%ecx		  #size = 5
+	subl %edx,%ecx		#size = 5
 	je Size_5
-	subl %edx,%ecx		  #size = 6
+	subl %edx,%ecx		#size = 6
 	je Size_6
-	subl %edx,%ecx		  #size = 7
+	subl %edx,%ecx		#size = 7
 	je Size_7
 	jmp Size_8
 
