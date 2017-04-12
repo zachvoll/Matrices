@@ -1,4 +1,4 @@
-# Y86
+# Matrices
 csim.c - a LRU cache simulator that replays traces from Valgrind and outputs stats (hits, misses, evictions).
 
 trans.c - contains a matrix wavefront function that attempts to minimize misses for specific sizes (32 sets and 256 sets).
